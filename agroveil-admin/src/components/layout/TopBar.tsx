@@ -1,5 +1,4 @@
 import { Search, Bell, ChevronDown, Globe } from 'lucide-react';
-import { Leaf } from 'lucide-react';
 
 interface Props {
   title?: string;
@@ -13,9 +12,7 @@ export default function TopBar({ title }: Props) {
         <h2 className="font-bold text-[#1A1A1A] text-lg">{title}</h2>
       ) : (
         <div className="flex items-center gap-2 flex-shrink-0">
-          <Leaf size={20} className="text-[#1E6B2E]" />
-          <span className="font-bold text-[#1E6B2E] text-base">AgroVeil</span>
-          <span className="text-[#888888] text-sm">Admin Console</span>
+          <img src={`${import.meta.env.BASE_URL}logo_agroveil.png`} alt="AgroVeil" className="h-7 w-auto" />
         </div>
       )}
 

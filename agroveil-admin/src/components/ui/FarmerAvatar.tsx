@@ -1,5 +1,8 @@
+const API_URL = import.meta.env.VITE_API_URL as string;
+
 interface Props {
   name: string;
+  photoUrl?: string;
   size?: 'sm' | 'md' | 'lg';
 }
 
@@ -26,8 +29,21 @@ function colorFor(name: string): string {
   return COLORS[hash % COLORS.length];
 }
 
-export default function FarmerAvatar({ name, size = 'md' }: Props) {
+export default function FarmerAvatar({ name, photoUrl, size = 'md' }: Props) {
   const sizeClass = size === 'sm' ? 'w-8 h-8 text-xs' : size === 'lg' ? 'w-14 h-14 text-xl' : 'w-10 h-10 text-sm';
+
+  if (photoUrl) {
+    const src = photoUrl.startsWith('http') ? photoUrl : `${API_URL}${photoUrl}`;
+    return (
+      <img
+        src={src}
+        alt={name}
+        className={`${sizeClass} rounded-xl object-cover flex-shrink-0`}
+        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+      />
+    );
+  }
+
   return (
     <div className={`${sizeClass} ${colorFor(name)} rounded-xl flex items-center justify-center font-bold flex-shrink-0`}>
       {getInitials(name)}

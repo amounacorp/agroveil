@@ -1,15 +1,18 @@
-export const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://35.224.208.173/agroveil/api';
-export const WS_URL  = process.env.EXPO_PUBLIC_WS_URL  ?? 'ws://35.224.208.173/agroveil/ws';
+export const API_URL  = process.env.EXPO_PUBLIC_API_URL ?? 'https://cortex-agents.com/agroveil/api';
+export const WS_URL   = process.env.EXPO_PUBLIC_WS_URL  ?? 'wss://cortex-agents.com/agroveil/ws';
 export const MOCK_MODE = process.env.EXPO_PUBLIC_MOCK_MODE === 'true';
 
 export const Endpoints = {
   login:           '/auth/otp/request',
   verify:          '/auth/otp/verify',
-  farmStats:       '/farms/stats',
-  alerts:          '/alerts',
-  alertById:       (id: string) => `/alerts/${id}`,
-  resolveAlert:    (id: string) => `/alerts/${id}/resolve`,
-  notifyWhatsApp:  (id: string) => `/alerts/${id}/notify-whatsapp`,
-  cameras:         '/cameras',
-  weeklyActivity:  '/analytics/weekly',
+  farmerLogin:     '/auth/farmer/login',
+  register:        '/auth/register',
+  googleLogin:     '/auth/google',
+  farmStats:       '/farmer/stats',
+  alerts:          '/farmer/alerts',
+  alertById:       (id: string) => `/farmer/alerts/${id}`,
+  resolveAlert:    (id: string) => `/farmer/alerts/${id}/resolve`,
+  notifyWhatsApp:  (id: string) => `/farmer/alerts/${id}/whatsapp`,
+  cameras:         '/farmer/cameras',
+  weeklyActivity:  '/farmer/weekly',
 } as const;

@@ -5,6 +5,8 @@ export interface Farmer {
   country: string;
   city: string;
   whatsapp_number: string;
+  email?: string;
+  photo_url?: string;
   is_active: boolean;
   created_at: string;
   subscription?: Subscription;
@@ -16,12 +18,30 @@ export interface Farmer {
 export interface Subscription {
   id: string;
   farmer_id: string;
+  farmer_name?: string;
+  farmer_phone?: string;
   plan: 'free' | 'eleveur' | 'pro' | 'cooperative';
   status: 'active' | 'expired' | 'suspended' | 'trial';
   max_cameras: number;
   price_fcfa: number;
+  addon_cameras: number;
+  history_days: number;
+  payment_method?: string;
   started_at: string;
   expires_at: string;
+}
+
+export interface PlanConfig {
+  id: number;
+  slug: string;
+  name: string;
+  price_fcfa: number;
+  max_cameras: number;
+  history_days: number;
+  addon_price_fcfa: number | null;
+  features: string[];
+  is_cooperative: boolean;
+  sort_order: number;
 }
 
 export interface Alert {

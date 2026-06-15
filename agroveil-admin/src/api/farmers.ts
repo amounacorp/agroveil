@@ -63,6 +63,16 @@ export async function updateFarmer(id: string, payload: Partial<Farmer>): Promis
   return data;
 }
 
+export async function uploadFarmerPhoto(id: string, file: File): Promise<{ photo_url: string }> {
+  const form = new FormData();
+  form.append('photo', file);
+  const { data } = await client.post<{ photo_url: string }>(`/farmers/${id}/photo`, form, {
+    headers: { 'Content-Type': undefined },
+    timeout: 30000,
+  });
+  return data;
+}
+
 export async function suspendFarmer(id: string): Promise<void> {
   await client.post(`/farmers/${id}/suspend`);
 }

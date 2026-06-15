@@ -232,17 +232,15 @@ export const mockReports: MonthlyReport[] = [
 
 export const mockSubscription: Subscription = {
   id: 'sub-001',
+  farmer_id: 'farmer-001',
   plan: 'eleveur',
   status: 'active',
   max_cameras: 3,
   price_fcfa: 5000,
+  addon_cameras: 0,
+  history_days: 90,
+  started_at: '2026-04-14T00:00:00Z',
   expires_at: '2026-07-14T00:00:00Z',
-  features: [
-    '3 caméras maximum',
-    'Alertes WhatsApp illimitées',
-    'Historique 90 jours',
-    'Rapports PDF automatiques',
-  ],
 };
 
 export const mockPayments: Payment[] = [

@@ -33,17 +33,16 @@ export default function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <SafeAreaProvider>
         <StatusBar style="light" backgroundColor="#131313" />
-        <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="alert/[id]"
-            options={{
-              headerShown: false,
-              presentation: 'modal',
-              animation: 'slide_from_bottom',
-            }}
-          />
+        <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
+          <Stack.Screen name="(auth)" options={{ animation: 'fade' }} />
+          <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
+          <Stack.Screen name="alert/[id]" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+          <Stack.Screen name="profile/edit" options={{ animation: 'slide_from_right' }} />
+          <Stack.Screen name="settings/notifications" options={{ animation: 'slide_from_right' }} />
+          <Stack.Screen name="settings/cameras" options={{ animation: 'slide_from_right' }} />
+          <Stack.Screen name="settings/ai-params" options={{ animation: 'slide_from_right' }} />
+          <Stack.Screen name="settings/sync" options={{ animation: 'slide_from_right' }} />
+          <Stack.Screen name="settings/help" options={{ animation: 'slide_from_right' }} />
         </Stack>
       </SafeAreaProvider>
     </QueryClientProvider>

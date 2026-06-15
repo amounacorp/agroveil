@@ -1,4 +1,5 @@
 import { MessageCircle, Bell } from 'lucide-react';
+import { API_URL } from '../../utils/constants';
 import { Sidebar } from './Sidebar';
 import { BottomNav } from './BottomNav';
 import { ToastContainer } from '../ui/Toast';
@@ -25,7 +26,11 @@ export function FarmerLayout({ children, title }: FarmerLayoutProps) {
       <header className="fixed top-0 left-0 md:left-60 right-0 h-16 bg-white border-b border-[#E8E8E8] z-40 flex items-center justify-between px-4 md:px-6 shadow-sm">
         {/* Left: logo (mobile) or title (desktop) */}
         <div className="md:hidden flex items-center gap-2">
-          <span className="text-[#1E6B2E] font-bold text-lg">AgroVeil</span>
+          <img
+            src={`${import.meta.env.BASE_URL}logo_agroveil.png`}
+            alt="AgroVeil"
+            className="h-7 w-auto"
+          />
         </div>
         <div className="hidden md:block">
           {title && <span className="text-[#1E6B2E] font-bold text-base">{title}</span>}
@@ -47,9 +52,17 @@ export function FarmerLayout({ children, title }: FarmerLayoutProps) {
               <p className="text-sm font-semibold text-[#1A1A1A] leading-tight">{farmer?.full_name ?? 'Fermier'}</p>
               <p className="text-[10px] text-[#888888] uppercase">Propriétaire</p>
             </div>
-            <div className="w-9 h-9 rounded-full bg-[#1E6B2E] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-              {farmer?.first_name?.charAt(0) ?? 'M'}
-            </div>
+            {farmer?.photo_url ? (
+              <img
+                src={farmer.photo_url.startsWith('http') ? farmer.photo_url : `${API_URL}${farmer.photo_url}`}
+                alt={farmer.full_name}
+                className="w-9 h-9 rounded-full object-cover flex-shrink-0 border border-[#E8E8E8]"
+              />
+            ) : (
+              <div className="w-9 h-9 rounded-full bg-[#1E6B2E] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                {farmer?.first_name?.charAt(0) ?? 'M'}
+              </div>
+            )}
           </div>
         </div>
       </header>

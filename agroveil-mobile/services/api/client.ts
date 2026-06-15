@@ -23,6 +23,11 @@ apiClient.interceptors.response.use(
       LocalStorage.remove(StorageKeys.AUTH_TOKEN);
       LocalStorage.remove(StorageKeys.AUTH_USER);
     }
-    return Promise.reject(error);
-  }
+    const d = error.response?.data;
+    const detail = Array.isArray(d?.detail)
+      ? d.detail.map((e: { msg?: string }) => e.msg).join(', ')
+      : d?.detail;
+    const message = detail ?? d?.message ?? 'Connexion perdue. Réessayez.';
+    return Promise.reject(new Error(message));
+  },
 );

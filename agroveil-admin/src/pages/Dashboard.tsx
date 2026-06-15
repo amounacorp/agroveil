@@ -52,10 +52,16 @@ export default function Dashboard() {
           </p>
         </div>
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 border border-[#E8E8E8] bg-white text-sm font-medium text-[#555555] rounded-btn hover:bg-[#F8FAF8] transition-colors">
+          <button
+            onClick={() => navigate('/admin/farmers')}
+            className="flex items-center gap-2 px-4 py-2 border border-[#E8E8E8] bg-white text-sm font-medium text-[#555555] rounded-btn hover:bg-[#F8FAF8] transition-colors"
+          >
             <Download size={16} /> Exporter
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-[#1E6B2E] text-white text-sm font-bold rounded-btn hover:bg-[#17521F] transition-colors">
+          <button
+            onClick={() => navigate('/admin/farmers', { state: { openAdd: true } })}
+            className="flex items-center gap-2 px-4 py-2 bg-[#1E6B2E] text-white text-sm font-bold rounded-btn hover:bg-[#17521F] transition-colors"
+          >
             <Plus size={16} /> Nouvel Éleveur
           </button>
         </div>

@@ -20,9 +20,11 @@ client.interceptors.response.use(
       localStorage.removeItem(TOKEN_KEY);
       window.location.href = '/agroveil/portail/#/login';
     }
-    const message =
-      error.response?.data?.message ??
-      'Connexion perdue. Réessayez dans un instant.';
+    const d = error.response?.data;
+    const detail = Array.isArray(d?.detail)
+      ? d.detail.map((e: { msg?: string }) => e.msg).join(', ')
+      : d?.detail;
+    const message = detail ?? d?.message ?? 'Connexion perdue. Réessayez dans un instant.';
     return Promise.reject(new Error(message));
   }
 );

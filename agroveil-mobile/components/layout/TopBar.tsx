@@ -1,8 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/colors';
 import { useAlertStore } from '../../store/alertStore';
+import { useAuthStore } from '../../store/authStore';
+import { API_URL } from '../../constants/api';
 
 interface Props {
   title: string;
@@ -11,8 +14,15 @@ interface Props {
 }
 
 export function TopBar({ title, showLiveBadge = false, showNotifBell = true }: Props) {
-  const insets = useSafeAreaInsets();
+  const insets      = useSafeAreaInsets();
   const unreadCount = useAlertStore((s) => s.unreadCount);
+  const user        = useAuthStore((s) => s.user);
+  const initials    = user?.full_name
+    ? user.full_name.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()
+    : '?';
+  const photoUri    = user?.photo_url
+    ? (user.photo_url.startsWith('http') ? user.photo_url : `${API_URL}${user.photo_url}`)
+    : null;
 
   return (
     <View style={[styles.bar, { paddingTop: insets.top + 8 }]}>
@@ -37,9 +47,13 @@ export function TopBar({ title, showLiveBadge = false, showNotifBell = true }: P
             )}
           </TouchableOpacity>
         )}
-        <View style={styles.avatar}>
-          <Text style={{ fontSize: 16 }}>👤</Text>
-        </View>
+        <TouchableOpacity style={styles.avatar} onPress={() => router.push('/(tabs)/account')} activeOpacity={0.8}>
+          {photoUri ? (
+            <Image source={{ uri: photoUri }} style={styles.avatarImg} />
+          ) : (
+            <Text style={styles.avatarInitials}>{initials}</Text>
+          )}
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -58,5 +72,7 @@ const styles = StyleSheet.create({
   bell:       { fontSize: 20 },
   badge:      { position: 'absolute', top: -4, right: -4, backgroundColor: Colors.error, borderRadius: 8, paddingHorizontal: 4, paddingVertical: 1 },
   badgeText:  { fontSize: 9, color: Colors.onError, fontWeight: '700' },
-  avatar:     { width: 36, height: 36, borderRadius: 18, backgroundColor: Colors.secondaryContainer, alignItems: 'center', justifyContent: 'center' },
+  avatar:         { width: 36, height: 36, borderRadius: 18, backgroundColor: Colors.primaryContainer, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  avatarImg:      { width: 36, height: 36, borderRadius: 18 },
+  avatarInitials: { fontSize: 13, fontWeight: '700', color: Colors.onPrimaryContainer },
 });

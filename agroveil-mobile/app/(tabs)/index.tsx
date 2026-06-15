@@ -13,8 +13,9 @@ import { TopBar } from '../../components/layout/TopBar';
 import { useFarmStats, useWeeklyActivity } from '../../hooks/useFarmStats';
 import { useAlerts } from '../../hooks/useAlerts';
 import { useOfflineSync } from '../../hooks/useOfflineSync';
+import { useCameras } from '../../hooks/useCameras';
 import { useAuthStore } from '../../store/authStore';
-import { MOCK_STATS, MOCK_CAMERAS } from '../../mocks';
+import { MOCK_STATS } from '../../mocks';
 import type { CameraStatus } from '../../types';
 
 export default function DashboardScreen() {
@@ -24,9 +25,9 @@ export default function DashboardScreen() {
   const { data: alerts = [] } = useAlerts();
   const user = useAuthStore((s) => s.user);
 
-  const firstName = user?.firstName ?? 'Fermier';
+  const { data: cameras = [] } = useCameras();
+  const firstName = user?.first_name ?? 'Fermier';
   const recentAlerts = alerts.slice(0, 3);
-  const cameras: CameraStatus[] = MOCK_CAMERAS;
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>

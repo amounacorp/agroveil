@@ -1,8 +1,9 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Bell, BarChart2, CreditCard, Settings, LogOut, Leaf } from 'lucide-react';
+import { LayoutDashboard, Bell, BarChart2, CreditCard, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useAlerts } from '../../hooks/useAlerts';
 import { mockFarm } from '../../api/mockData';
+import { API_URL } from '../../utils/constants';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Tableau de bord', exact: true },
@@ -27,9 +28,12 @@ export function Sidebar() {
     <nav className="hidden md:flex flex-col h-screen fixed left-0 top-0 w-60 bg-[#0F3D1A] shadow-lg z-50">
       {/* Logo */}
       <div className="px-6 py-5 border-b border-white/10">
-        <div className="flex items-center gap-2 mb-1">
-          <Leaf size={22} className="text-[#8BD88E]" />
-          <h1 className="text-xl font-bold text-white">AgroVeil</h1>
+        <div className="flex items-center gap-3 mb-1">
+          <img
+            src={`${import.meta.env.BASE_URL}logo_agroveil.png`}
+            alt="AgroVeil"
+            className="h-8 w-auto"
+          />
         </div>
         <p className="text-xs text-white/50 uppercase tracking-widest">Portail Fermier</p>
       </div>
@@ -63,9 +67,17 @@ export function Sidebar() {
       {/* User */}
       <div className="p-4 border-t border-white/10">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-9 h-9 rounded-full bg-[#1E6B2E] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-            {farmer?.first_name?.charAt(0) ?? 'M'}
-          </div>
+          {farmer?.photo_url ? (
+            <img
+              src={farmer.photo_url.startsWith('http') ? farmer.photo_url : `${API_URL}${farmer.photo_url}`}
+              alt={farmer.full_name}
+              className="w-9 h-9 rounded-full object-cover flex-shrink-0 border border-white/20"
+            />
+          ) : (
+            <div className="w-9 h-9 rounded-full bg-[#1E6B2E] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+              {farmer?.first_name?.charAt(0) ?? 'M'}
+            </div>
+          )}
           <div className="overflow-hidden">
             <p className="text-sm font-semibold text-white truncate">{farmer?.full_name ?? 'Fermier'}</p>
             <p className="text-[10px] text-white/50 uppercase">Propriétaire</p>

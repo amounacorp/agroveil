@@ -9,6 +9,7 @@ import { authApi } from '../../services/api/auth';
 import { useAuthStore } from '../../store/authStore';
 import { LocalStorage, StorageKeys } from '../../services/offline/LocalStorage';
 import { MOCK_MODE } from '../../constants/api';
+import type { User } from '../../types';
 
 export default function VerifyScreen() {
   const { phone } = useLocalSearchParams<{ phone: string }>();
@@ -40,22 +41,30 @@ export default function VerifyScreen() {
     setLoading(true);
     try {
       if (MOCK_MODE) {
-        const mockUser = { id: 'u1', phone: phone ?? '', firstName: 'Fermier', lastName: 'Demo', farmName: 'Bâtiment A', token: 'mock-token' };
+        const mockUser: User = {
+          id: 'u1',
+          phone: phone ?? '',
+          full_name: 'Fermier Demo',
+          first_name: 'Fermier',
+          country: 'CG',
+          language: 'fr',
+          created_at: new Date().toISOString(),
+        };
         LocalStorage.set(StorageKeys.AUTH_TOKEN, 'mock-token');
         LocalStorage.set(StorageKeys.AUTH_USER, mockUser);
         setUser(mockUser);
         setToken('mock-token');
       } else {
         const res = await authApi.verifyOtp(phone ?? '', code);
-        const { user, token } = res.data;
+        const { token, farmer } = res.data;
         LocalStorage.set(StorageKeys.AUTH_TOKEN, token);
-        LocalStorage.set(StorageKeys.AUTH_USER, user);
-        setUser(user);
+        LocalStorage.set(StorageKeys.AUTH_USER, farmer);
+        setUser(farmer);
         setToken(token);
       }
       router.replace('/(tabs)');
-    } catch {
-      setError('Code incorrect. Réessayez.');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Code incorrect. Réessayez.');
     } finally {
       setLoading(false);
     }

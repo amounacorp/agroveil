@@ -10,6 +10,7 @@ import AlertDetail from './pages/alerts/AlertDetail';
 import Analytics from './pages/Analytics';
 import Subscriptions from './pages/Subscriptions';
 import Settings from './pages/Settings';
+import AIModels from './pages/AIModels';
 import type { ReactNode } from 'react';
 
 const queryClient = new QueryClient({
@@ -93,6 +94,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Settings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/ai-models"
+            element={
+              <ProtectedRoute>
+                <AIModels />
               </ProtectedRoute>
             }
           />

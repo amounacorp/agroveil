@@ -75,10 +75,15 @@ export interface AIDetectionResult {
 export interface User {
   id: string;
   phone: string;
-  firstName: string;
-  lastName: string;
-  farmName: string;
-  token: string;
+  full_name: string;
+  first_name: string;
+  email?: string;
+  country: string;
+  city?: string;
+  whatsapp_number?: string;
+  photo_url?: string;
+  language: 'fr';
+  created_at: string;
 }
 
 export type AlertSeverity = Alert['severity'];

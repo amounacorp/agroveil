@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Leaf, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { login } from '../api/auth';
 import { useAuthStore } from '../store/authStore';
 
@@ -48,10 +48,7 @@ export default function Login() {
         <div className="bg-white rounded-card shadow-card border border-[#E8E8E8] p-8">
           {/* Logo */}
           <div className="flex flex-col items-center mb-8">
-            <div className="w-14 h-14 bg-[#EAF3DE] rounded-2xl flex items-center justify-center mb-3">
-              <Leaf size={28} className="text-[#1E6B2E]" />
-            </div>
-            <h1 className="text-xl font-bold text-[#1A1A1A]">AgroVeil</h1>
+            <img src={`${import.meta.env.BASE_URL}logo_agroveil.png`} alt="AgroVeil" className="h-16 w-auto mb-3" />
             <p className="text-sm font-medium text-[#555555]">Admin Console</p>
             <p className="text-xs text-[#888888] mt-1 text-center">
               Accès réservé à l'équipe AgroVeil
