@@ -19,7 +19,7 @@ export const MOCK_BOXES: DetectionBox[] = [
   { id: 2, type: 'healthy',  confidence: 0.94, label: 'SAIN 94%',    bbox: { x: 0.50, y: 0.45, width: 0.10, height: 0.12 } },
   { id: 3, type: 'healthy',  confidence: 0.99, label: 'SAIN 99%',    bbox: { x: 0.65, y: 0.15, width: 0.14, height: 0.18 } },
   { id: 4, type: 'sick',     confidence: 0.87, label: 'MALADE 87%',  bbox: { x: 0.20, y: 0.60, width: 0.15, height: 0.20 } },
-  { id: 5, type: 'inactive', confidence: 0.76, label: 'INACTIF',     bbox: { x: 0.80, y: 0.30, width: 0.10, height: 0.12 } },
+  { id: 5, type: 'feeder',   confidence: 0.91, label: 'MANGEOIRE',   bbox: { x: 0.80, y: 0.30, width: 0.10, height: 0.12 } },
 ];
 
 export const MOCK_ALERTS: Alert[] = [

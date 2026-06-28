@@ -78,7 +78,7 @@ export interface CameraStatus {
 
 export interface DetectionBox {
   id: number;
-  type: 'healthy' | 'sick' | 'inactive' | 'dead';
+  type: 'healthy' | 'sick' | 'feeder' | 'drinker';
   confidence: number;
   label: string;
   bbox: { x: number; y: number; width: number; height: number };

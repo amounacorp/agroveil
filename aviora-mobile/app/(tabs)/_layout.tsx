@@ -1,5 +1,6 @@
 import { Text, View } from 'react-native';
 import { Tabs } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/colors';
 import { useAlertStore } from '../../store/alertStore';
 import { useT } from '../../hooks/useT';
@@ -15,6 +16,7 @@ function TabIcon({ emoji }: { emoji: string }) {
 export default function TabsLayout() {
   const unreadCount = useAlertStore((s) => s.unreadCount);
   const t = useT();
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
@@ -24,8 +26,8 @@ export default function TabsLayout() {
           backgroundColor: Colors.surfaceContainer,
           borderTopColor: Colors.outlineVariant + '33',
           borderTopWidth: 1,
-          height: 80,
-          paddingBottom: 16,
+          height: 64 + insets.bottom,
+          paddingBottom: insets.bottom + 4,
           paddingTop: 8,
         },
         tabBarActiveTintColor:   Colors.secondary,

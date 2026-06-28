@@ -33,9 +33,9 @@ export function evaluateDetections(boxes: DetectionBox[]): Alert | null {
 
   const now = Date.now();
 
-  // MORTALITY: sick/dead box present continuously > immobileSeconds
+  // MORTALITY: sick box present continuously > immobileSeconds
   for (const box of boxes) {
-    if (box.type === 'sick' || box.type === 'dead') {
+    if (box.type === 'sick') {
       const since = sickSince[box.id] ?? now;
       sickSince[box.id] = since;
       if ((now - since) / 1000 >= Thresholds.immobileSeconds) {
@@ -43,7 +43,7 @@ export function evaluateDetections(boxes: DetectionBox[]): Alert | null {
           type: 'mortality',
           severity: 'critical',
           confidence: box.confidence,
-          description: `Oiseau immobile détecté (${box.label}) depuis ${Math.round((now - since) / 60000)} min`,
+          description: `Oiseau malade détecté (${box.label}) depuis ${Math.round((now - since) / 60000)} min`,
           advice: 'Isolez immédiatement l\'oiseau et vérifiez les signes vitaux',
           immediateSteps: [
             'Isolez l\'oiseau concerné',
@@ -59,7 +59,7 @@ export function evaluateDetections(boxes: DetectionBox[]): Alert | null {
   }
 
   // HEAT_STRESS: >40% birds near edges
-  const total = boxes.filter((b) => b.type !== 'dead').length;
+  const total = boxes.filter((b) => b.type === 'healthy' || b.type === 'sick').length;
   const peripheral = boxes.filter((b) => b.bbox.x < 0.1 || b.bbox.x + b.bbox.width > 0.9).length;
   if (total > 0 && peripheral / total >= Thresholds.peripheralGroupPct) {
     return buildAlert({
@@ -77,33 +77,34 @@ export function evaluateDetections(boxes: DetectionBox[]): Alert | null {
     });
   }
 
-  // INACTIVITY: 2+ inactive birds sustained for inactivityMinutes
-  const inactiveCount = boxes.filter((b) => b.type === 'inactive').length;
-  if (inactiveCount >= 2) {
-    if (inactiveSince === null) inactiveSince = now;
-    const inactiveMin = (now - inactiveSince) / 60000;
-    if (inactiveMin >= Thresholds.inactivityMinutes) {
-      inactiveSince = null;
+  // FEEDER_EMPTY: feeder detected but no healthy birds for feederEmptyMinutes
+  const hasFeeders = boxes.some((b) => b.type === 'feeder');
+  const healthyNearFeeder = boxes.some((b) => b.type === 'healthy');
+  if (hasFeeders && !healthyNearFeeder) {
+    if (feederSince === null) feederSince = now;
+    const feederMin = (now - feederSince) / 60000;
+    if (feederMin >= Thresholds.feederEmptyMinutes) {
+      feederSince = null;
       return buildAlert({
-        type: 'inactivity',
+        type: 'feeder_empty',
         severity: 'warning',
-        confidence: 0.80,
-        description: `${inactiveCount} oiseaux inactifs depuis ${Math.round(inactiveMin)} min — comportement anormal`,
-        advice: "Des oiseaux immobiles groupés peuvent signaler une maladie ou un stress de confinement.",
+        confidence: 0.78,
+        description: `Mangeoire visible mais aucun oiseau sain ne s'alimente depuis ${Math.round(feederMin)} min`,
+        advice: 'Les oiseaux sans accès à la nourriture développent rapidement des comportements agressifs.',
         immediateSteps: [
-          'Localisez les oiseaux inactifs et examinez leur posture',
-          'Vérifiez l\'accès à l\'eau et à la nourriture',
-          'Isolez les sujets présentant des symptômes visibles',
+          'Vérifiez le niveau des mangeoires dans toutes les zones',
+          'Contrôlez le mécanisme de distribution automatique si applicable',
+          'Remplissez les mangeoires vides immédiatement',
         ],
-        preventionTip: 'Contrôlez quotidiennement l\'activité générale du troupeau tôt le matin.',
+        preventionTip: 'Planifiez deux ravitaillements par jour (matin et après-midi).',
       });
     }
   } else {
-    inactiveSince = null;
+    feederSince = null;
   }
 
-  // CANNIBALISM: 3+ sick/dead boxes spatially clustered (std-dev of x < 0.15)
-  const sickDead = boxes.filter((b) => b.type === 'sick' || b.type === 'dead');
+  // CANNIBALISM: 3+ sick boxes spatially clustered (std-dev of x < 0.15)
+  const sickDead = boxes.filter((b) => b.type === 'sick');
   if (sickDead.length >= 3) {
     const xs = sickDead.map((b) => b.bbox.x);
     const meanX = xs.reduce((a, v) => a + v, 0) / xs.length;
@@ -131,31 +132,6 @@ export function evaluateDetections(boxes: DetectionBox[]): Alert | null {
     }
   } else {
     cannibSince = null;
-  }
-
-  // FEEDER_EMPTY: no healthy birds detected but total > threshold (birds seeking food)
-  const totalBirds = boxes.filter((b) => b.type !== 'dead').length;
-  const healthyCount = boxes.filter((b) => b.type === 'healthy').length;
-  if (totalBirds >= 5 && healthyCount === 0) {
-    if (feederSince === null) feederSince = now;
-    if ((now - feederSince) / 60000 >= Thresholds.feederEmptyMinutes) {
-      feederSince = null;
-      return buildAlert({
-        type: 'feeder_empty',
-        severity: 'info',
-        confidence: 0.72,
-        description: `Aucun comportement alimentaire détecté depuis ${Thresholds.feederEmptyMinutes} min`,
-        advice: 'Les oiseaux sans accès à la nourriture développent rapidement des comportements agressifs.',
-        immediateSteps: [
-          'Vérifiez le niveau des mangeoires dans toutes les zones',
-          'Contrôlez le mécanisme de distribution automatique si applicable',
-          'Remplissez les mangeoires vides immédiatement',
-        ],
-        preventionTip: 'Planifiez deux ravitaillements par jour (matin et après-midi).',
-      });
-    }
-  } else {
-    feederSince = null;
   }
 
   // ABNORMAL_MOVEMENT: average displacement across frames exceeds threshold

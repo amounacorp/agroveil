@@ -15,10 +15,10 @@ interface Props {
 }
 
 const BOX_COLORS: Record<DetectionBox['type'], { border: string; labelBg: string; labelText: string }> = {
-  healthy:  { border: Colors.primary,    labelBg: Colors.secondary,       labelText: Colors.onSecondary },
-  sick:     { border: Colors.error,      labelBg: Colors.error,            labelText: Colors.onError },
-  inactive: { border: Colors.tertiary,   labelBg: Colors.tertiary,         labelText: Colors.onTertiary },
-  dead:     { border: Colors.outline,    labelBg: Colors.surfaceVariant,   labelText: Colors.onSurface },
+  healthy: { border: Colors.primary,  labelBg: Colors.secondary,     labelText: Colors.onSecondary },
+  sick:    { border: Colors.error,    labelBg: Colors.error,          labelText: Colors.onError },
+  feeder:  { border: Colors.tertiary, labelBg: Colors.tertiary,       labelText: Colors.onTertiary },
+  drinker: { border: '#2196F3',       labelBg: '#2196F3',             labelText: '#FFFFFF' },
 };
 
 export function AIDetectionBox({ box, containerWidth, containerHeight }: Props) {

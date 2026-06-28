@@ -28,7 +28,7 @@
         "EXPO_PUBLIC_MOCK_MODE": "false"
       },
       "android": {
-        "buildType": "aab"
+        "buildType": "app-bundle"
       }
     }
   },

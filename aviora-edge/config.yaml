@@ -1,0 +1,44 @@
+# Aviora Edge — Configuration
+# Copier ce fichier sur le serveur edge (Raspberry Pi / Jetson / NUC)
+# et adapter les valeurs à votre installation.
+
+api:
+  base_url: "https://api.aviora.com"   # URL de l'API Aviora backend
+  api_key:  "VOTRE_CLE_API_ICI"        # Clé générée depuis aviora-admin
+
+farm:
+  id:   "ferme-001"
+  name: "Bâtiment A"
+
+model:
+  path:       "models/aviora_yolov8.pt"   # chemin vers le modèle entraîné
+  imgsz:      640
+  confidence: 0.45    # seuil de confiance minimum
+  iou:        0.45    # seuil NMS
+
+cameras:
+  - id:     "cam-01"
+    name:   "Zone Nord"
+    url:    "rtsp://admin:password@192.168.1.101/stream"
+    fps:    2          # frames analysées par seconde (2 suffit, économise le CPU)
+
+  - id:     "cam-02"
+    name:   "Zone Sud"
+    url:    "rtsp://admin:password@192.168.1.102/stream"
+    fps:    2
+
+  - id:     "cam-03"
+    name:   "Zone Est"
+    url:    "rtsp://admin:password@192.168.1.103/stream"
+    fps:    2
+
+  # Ajouter autant de caméras que nécessaire
+  # - id:   "cam-04"
+  #   name: "Zone Ouest"
+  #   url:  "rtsp://..."
+  #   fps:  2
+
+alerts:
+  mortality_seconds:    30    # délai avant alerte oiseau mort/malade
+  feeder_empty_minutes: 10   # délai avant alerte mangeoire vide
+  debounce_seconds:     300  # 5 min entre deux alertes du même type

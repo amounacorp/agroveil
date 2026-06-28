@@ -7,11 +7,6 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "scheme": "aviora",
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#131313"
-    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.aviora.mobile",
@@ -48,6 +43,14 @@
     },
     "plugins": [
       "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#131313"
+        }
+      ],
       "react-native-fast-tflite",
       [
         "expo-camera",
@@ -71,8 +74,12 @@
     },
     "extra": {
       "eas": {
-        "projectId": ""
+        "projectId": "3fa96886-1354-4039-9568-ebc8b4a965bc"
+      },
+      "router": {
+        "origin": false
       }
-    }
+    },
+    "owner": "soddymorais"
   }
 }

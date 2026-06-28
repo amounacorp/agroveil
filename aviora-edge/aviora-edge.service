@@ -1,0 +1,26 @@
+# Service systemd — démarre Aviora Edge automatiquement au démarrage du serveur
+# Installation :
+#   sudo cp aviora-edge.service /etc/systemd/system/
+#   sudo systemctl enable aviora-edge
+#   sudo systemctl start aviora-edge
+#
+# Logs :
+#   sudo journalctl -u aviora-edge -f
+
+[Unit]
+Description=Aviora Edge — Service IA surveillance volailles
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/aviora-edge
+ExecStart=/home/pi/aviora-edge/venv/bin/python main.py --config /home/pi/aviora-edge/config.yaml
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

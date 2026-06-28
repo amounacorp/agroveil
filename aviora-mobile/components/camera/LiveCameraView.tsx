@@ -12,10 +12,10 @@ interface Props {
 }
 
 const BOX_COLORS: Record<DetectionBox['type'], string> = {
-  healthy:  '#4CAF50',
-  sick:     '#F44336',
-  inactive: '#FF9800',
-  dead:     '#9C27B0',
+  healthy: '#4CAF50',
+  sick:    '#F44336',
+  feeder:  '#FF9800',
+  drinker: '#2196F3',
 };
 
 export function LiveCameraView({ boxes, isAIActive, fps = 30, cameraName = 'Cam√©ra' }: Props) {
@@ -48,7 +48,7 @@ export function LiveCameraView({ boxes, isAIActive, fps = 30, cameraName = 'Cam√
 
   return (
     <View style={[styles.container, { height: viewHeight }]}>
-      <CameraView style={StyleSheet.absoluteFill} facing="back" />
+      <CameraView style={StyleSheet.absoluteFill} facing="back" active={true} />
 
       {/* Detection boxes overlay using absolute pixel coords from normalised bbox */}
       <View style={StyleSheet.absoluteFill} pointerEvents="none">
@@ -90,7 +90,6 @@ export function LiveCameraView({ boxes, isAIActive, fps = 30, cameraName = 'Cam√
 const styles = StyleSheet.create({
   container: {
     borderRadius: 14,
-    overflow: 'hidden',
     backgroundColor: '#000',
   },
   placeholder: {

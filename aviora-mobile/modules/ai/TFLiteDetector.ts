@@ -1,8 +1,8 @@
 ﻿import type { DetectionBox } from '../../types';
 import { Thresholds } from '../../constants/thresholds';
 
-// Classes that the YOLOv8 model recognises
-const CLASSES = ['healthy', 'sick', 'inactive', 'dead', 'feeder', 'drinker', 'group_stress'] as const;
+// Classes matching aviora-mvp-merged dataset (4 classes, same order as data.yaml)
+const CLASSES = ['healthy', 'sick', 'feeder', 'drinker'] as const;
 type ModelClass = typeof CLASSES[number];
 
 interface RawDetection {
@@ -31,12 +31,10 @@ function nms(detections: RawDetection[], iouThreshold = 0.45): RawDetection[] {
 
 function labelFor(type: ModelClass, confidence: number): string {
   switch (type) {
-    case 'healthy':     return `SAIN ${Math.round(confidence * 100)}%`;
-    case 'sick':        return `MALADE ${Math.round(confidence * 100)}%`;
-    case 'inactive':    return 'INACTIF';
-    case 'dead':        return 'MORT';
-    case 'group_stress':return 'STRESS';
-    default:            return type.toUpperCase();
+    case 'healthy': return `SAIN ${Math.round(confidence * 100)}%`;
+    case 'sick':    return `MALADE ${Math.round(confidence * 100)}%`;
+    case 'feeder':  return 'MANGEOIRE';
+    case 'drinker': return 'ABREUVOIR';
   }
 }
 
@@ -46,9 +44,11 @@ export class TFLiteDetector {
 
   /**
    * Returns true if a real trained model was loaded, false if falling back to simulation.
-   * A false return is not an error — caller should activate simulation mode.
-   * To use a real model: replace assets/models/Aviora_yolov8.tflite with a valid
-   * YOLOv8n-pose TFLite export (input: [1,640,640,3] float32, output: [1,N,12]).
+   * Model spec (Ultralytics YOLOv8n float32 TFLite):
+   *   input  : [1, 640, 640, 3] float32, values in [0, 1]
+   *   output : [1, 8, 8400]  →  8 = 4 bbox coords + 4 class scores
+   *            layout (transposed): [cx×8400, cy×8400, w×8400, h×8400, cls0×8400 …]
+   *            coordinates are in pixel space (0–640), no separate objectness score.
    */
   async load(): Promise<boolean> {
     try {
@@ -84,43 +84,48 @@ export class TFLiteDetector {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private postProcess(output: any[]): DetectionBox[] {
     const raw = output[0] as Float32Array;
-    const numDetections = raw.length / (5 + CLASSES.length);
+
+    // YOLOv8n TFLite: output shape [1, nc+4, 8400] flattened
+    // row k = raw[k * NUM_ANCHORS .. (k+1) * NUM_ANCHORS - 1]
+    // rows 0-3 = cx, cy, w, h  (pixel space 0–640)
+    // rows 4..4+nc-1 = class scores (no objectness in YOLOv8)
+    const NUM_ANCHORS = 8400;
+    const IMGSZ = 640;
+    const expectedLen = (4 + CLASSES.length) * NUM_ANCHORS;
+
+    if (raw.length !== expectedLen) {
+      console.warn(`[Aviora AI] Output length ${raw.length} ≠ expected ${expectedLen} — skipping frame`);
+      return [];
+    }
+
     const detections: RawDetection[] = [];
 
-    for (let i = 0; i < numDetections; i++) {
-      const offset = i * (5 + CLASSES.length);
-      const confidence = raw[offset + 4];
-      if (confidence < Thresholds.confidenceMin) continue;
-
+    for (let i = 0; i < NUM_ANCHORS; i++) {
+      // Pick best class
       let maxClass = 0;
       let maxScore = 0;
       for (let c = 0; c < CLASSES.length; c++) {
-        if (raw[offset + 5 + c] > maxScore) {
-          maxScore = raw[offset + 5 + c];
-          maxClass = c;
-        }
+        const score = raw[(4 + c) * NUM_ANCHORS + i];
+        if (score > maxScore) { maxScore = score; maxClass = c; }
       }
+      if (maxScore < Thresholds.confidenceMin) continue;
 
-      detections.push({
-        x: raw[offset],     y: raw[offset + 1],
-        w: raw[offset + 2], h: raw[offset + 3],
-        confidence: confidence * maxScore,
-        classIndex: maxClass,
-      });
+      // Convert center-format pixels → top-left normalized [0-1]
+      const cx = raw[0 * NUM_ANCHORS + i] / IMGSZ;
+      const cy = raw[1 * NUM_ANCHORS + i] / IMGSZ;
+      const w  = raw[2 * NUM_ANCHORS + i] / IMGSZ;
+      const h  = raw[3 * NUM_ANCHORS + i] / IMGSZ;
+
+      detections.push({ x: cx - w / 2, y: cy - h / 2, w, h, confidence: maxScore, classIndex: maxClass });
     }
 
     const kept = nms(detections);
-    return kept.map((d, idx): DetectionBox => {
-      const type = CLASSES[d.classIndex] as DetectionBox['type'];
-      return {
-        id: idx + 1,
-        type: (['healthy', 'sick', 'inactive', 'dead'] as const).includes(type as never)
-          ? (type as DetectionBox['type'])
-          : 'inactive',
-        confidence: d.confidence,
-        label: labelFor(CLASSES[d.classIndex], d.confidence),
-        bbox: { x: d.x, y: d.y, width: d.w, height: d.h },
-      };
-    });
+    return kept.map((d, idx): DetectionBox => ({
+      id: idx + 1,
+      type: CLASSES[d.classIndex],
+      confidence: d.confidence,
+      label: labelFor(CLASSES[d.classIndex], d.confidence),
+      bbox: { x: d.x, y: d.y, width: d.w, height: d.h },
+    }));
   }
 }

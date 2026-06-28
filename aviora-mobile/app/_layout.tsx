@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Stack } from 'expo-router';
+import { useEffect } from 'react';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -17,22 +17,34 @@ const queryClient = new QueryClient({
 });
 
 export default function RootLayout() {
-  const { setUser, setToken } = useAuthStore();
+  const { token, setUser, setToken } = useAuthStore();
+  const segments = useSegments();
+  const router   = useRouter();
 
   // Rehydrate auth from persistent storage on app launch
   useEffect(() => {
-    const token = LocalStorage.get<string>(StorageKeys.AUTH_TOKEN);
-    const user  = LocalStorage.get<User>(StorageKeys.AUTH_USER);
-    if (token && user) {
-      setToken(token);
-      setUser(user);
+    const storedToken = LocalStorage.get<string>(StorageKeys.AUTH_TOKEN);
+    const storedUser  = LocalStorage.get<User>(StorageKeys.AUTH_USER);
+    if (storedToken && storedUser) {
+      setToken(storedToken);
+      setUser(storedUser);
     }
   }, [setToken, setUser]);
+
+  // Navigate based on auth state
+  useEffect(() => {
+    const inAuthGroup = segments[0] === '(auth)';
+    if (!token && !inAuthGroup) {
+      router.replace('/(auth)/login');
+    } else if (token && inAuthGroup) {
+      router.replace('/(tabs)');
+    }
+  }, [token, segments, router]);
 
   return (
     <QueryClientProvider client={queryClient}>
       <SafeAreaProvider>
-        <StatusBar style="light" backgroundColor="#131313" />
+        <StatusBar style="light" />
         <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
           <Stack.Screen name="(auth)" options={{ animation: 'fade' }} />
           <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
